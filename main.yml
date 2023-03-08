@@ -1,0 +1,287 @@
+# Εισαγωγή του οδηγού mysql.connector ως mysql.
+import mysql.connector as mysql
+
+# Δημιουργία του αντικειμένου σύνδεσης με τη βάση test.
+mydb = mysql.connect(host = 'localhost',
+                     user = 'root',
+                     passwd = '',
+                     db = 'test')
+
+# Δημιουργία του αντικειμένου κέρσορα της βάσης test.
+cursor = mydb.cursor()
+
+# Δημιουργία του πίνακα Sequence με τα ζητούμενα 4 πεδία, όπου:
+# 1. Το πρώτο πεδίο παίρνει ακέραιες τιμές.
+# 2. Το δευτερο πεδίο παίνρει αλφαριθμητικές τιμές μήκους 3.
+# 3. Το τρίτο πεδίο παίρνει αλφαριθμητικές τιμές μεταβαλλόμενου μήκους έως 40.
+# 4. Το τέταρτο πεδίο παίρνει ακέραιες τιμές.
+cursor.execute("""CREATE TABLE Sequence (ID INT,
+                                         KIND CHAR(3),
+                                         BIO_SEQ VARCHAR(40),
+                                         YEAR INT)""")
+
+# Εφαρμογή των αλλαγών στην βάση.
+mydb.commit()
+ΘΕΜΑ 2:
+class Sequence:
+    # Κατασκευαστής της κλάσης με τα ζητούμενα 4 πεδία.
+    def __init__(self,ID,KIND,BIO_SEQ,YEAR):
+        self.id = ID
+        self.kind = KIND
+        self.bio_seq = BIO_SEQ
+        self.year = YEAR
+
+    # Συνάρτηση εκτύπωσης της πληροφορίας των αντικειμένων της κλάσης.
+    def print_info(self):
+        print('ID: %s' %(self.id))
+        print('KIND: %s' %(self.kind))
+        print('BIOLOGICAL SEQUENCE: %s' %(self.bio_seq))
+        print('YEAR: %s' %(self.year))
+
+    # Συνάρτηση για την εγκυρώτητα της βιολογικής ακολουθίας.
+    def validate(self):
+        # Μεταβλητές με τους έγκυρους χαρακτήρες για ακολοθίες DNA και RNA.
+        DNA_dic = ['A','C','G','T']
+        RNA_dic = ['A','C','G','U']
+
+        # Μεταβλητή με την ακολουθία με κεφαλαίους χαρακτήρες, λαμβάνοντας
+        # υπόψη την περίπτωση που περιείχε μικρούς.
+        seq = self.bio_seq.upper()
+
+        # Μεταβλητή - μετρητής για τους έγκυρους χαρακτήρες της ακολουθίας.
+        lenght = 0
+
+        # Έλεγχος για το είδος της ακολουθίας.
+
+        # Περίπτωση DNA ακολουθίας.
+        if self.kind == 'DNA':
+
+            # Εύρεση πλήθους έγκυρων χαρακτήρων στην ακολουθία.
+            for x in seq:
+                if x in DNA_dic:
+                    lenght += 1
+
+            # Στην περίπτωση που οι έγκυροι χαρακτήρες ισούνται με το πλήθος των
+            # συνολικών χαρακτήρων της ακολουθίας, τότε θα ήταν έγκυρη.
+            if lenght == len(self.bio_seq):
+                result = 'DNA sequence is valid.'
+
+            # Διαφορετικά δεν θα ήταν.
+            else:
+                result = 'DNA sequence is invalid.'
+
+        # Περίπτωση RNA ακολουθίας, αντίστοιχα με την προηγούμενη περίπτωση.
+        elif self.kind == 'RNA':
+            for x in seq:
+                if x in RNA_dic:
+                    lenght += 1
+            if lenght == len(self.bio_seq):
+                result = 'RNA sequence is valid.'
+            else:
+                result = 'RNA sequence is invalid.'               
+
+        # Αποτέλεσμα της συνάρτησης το κατάλληλο κάθε φορά αλφαρηθμητικό.
+        return(result)
+            
+# Δημιουργία αντικειμένου.
+a = Sequence(1,'DNA','AGTAattaCCCGG',2020)
+
+# Εκτύπωση του αποτελέσματος της validate().
+print(a.validate())
+
+
+ΘΕΜΑ 3:
+# Λίστα με τις δυνατές ενέργειες του χρήστη.
+actions = ['1. Εισαγωγή νέας εγγραφής',
+           '2. Διαγραφή εγγραφής',
+           '3. Εκτύπωση εγγραφής',
+           '4. Έξοδος']
+
+# Εκτύπωση της παραπάνω λίστας.
+for x in actions:
+    print(x)
+
+# Εισαγωγή του αναγνωριστικού ενέργειας από το χρήστη.
+# Επειδή είναι ακέραιος χρησιμοποιούμε την int().
+action_taken = int(input('Δώστε αναγνωριστικό ενέργειας: '))
+
+# Εισαγωγή της κλάσης Sequence.
+from sequence import Sequence
+
+# Εισαγωγή του οδηγού mysql.connector ως mysql.
+import mysql.connector as mysql
+
+# Δημιουργία του αντικειμένου σύνδεσης με τη βάση test.
+mydb = mysql.connect(host = 'localhost',
+                     user = 'root',
+                     passwd = '',
+                     db = 'test')
+
+# Δημιουργία του αντικειμένου κέρσορα της βάσης test.
+cursor = mydb.cursor()
+
+# Περιπτώσεις για τις δυνατές πράξεις του χρήστη.
+
+# Περίπτωση που θα δώσει την τιμή 1.
+if action_taken == 1:
+
+    # Εισαγωγή των δεδομένων που θέλει να εισάγει στον πίνακα Sequence ο χρήστης.
+    new_entry_id = int(input('Δώστε αναγνωριστικό εγγραφής: '))
+    new_entry_kind = input('Δώστε είδος αλληλουχίας: ')
+    new_entry_seq = input('Δώστε την βιολογική αλληλουχία: ')
+    new_entry_year = int(input('Δώστε έτος καταχώρησης: '))
+
+    # Δημιουργία αντικειμένου Sequence με τη χρήση των δεδομένων που δόθηκαν
+    # από τον χρήστη.
+    new_entry = Sequence(new_entry_id,
+                         new_entry_kind,
+                         new_entry_seq,
+                         new_entry_year)
+    
+    # Λίστα που περιλαμβάνει τις περιπτώσεις που το αποτέλεσμα της validate()
+    # επικυρώνει την αλληλουχία.
+    right = ['DNA sequence is valid.','RNA sequence is valid.']
+
+    # Στην περίπτωση που δεν είναι έγκυρη η ακολουθία, δηλαδή το αποτέλεσμα της
+    # validate() δεν ανήκει στην παραπάνω λίστα, θα έχει δοθεί λανθασμένη
+    # αλληλουχία και θα τερματίζει το πρόγραμμα με το κλείσμο του κέρσορα και της
+    # σύνδεσης με τη βάση.
+    if new_entry.validate() not in right:
+        print('Wrong sequence given.')
+        cursor.close()
+        mydb.close()
+
+    # Αν είναι έγκυρη η ακολουθία θα εισάγεται η καινούρια πληροφορία ως μία
+    # καινούρια εγγραφή στον πίνακα Sequence.
+    else:
+      cursor.execute("""INSERT INTO Sequence VALUES(%s,'%s','%s',%s)"""
+                     %(new_entry_id,
+                       new_entry_kind,
+                       new_entry_seq,
+                       new_entry_year))
+      mydb.commit()
+
+# Περίπτωση που θα δώσει την τιμή 2.
+elif action_taken == 2:
+    
+    # Δίνεται από τον χρήστη το αναγωριστικό της εγγραφής που θέλει να διαγράψει.
+    entry_id = int(input('Δώστε αναγνωριστικό εγγραφής: '))
+
+    # Επιλέγονται όλα τα πεδία του πίνακα Sequence.
+    cursor.execute("""SELECT * from Sequence""")
+
+    # Εκχωρούνται όλες οι εγγραφές του πίνακα Sequence στην μεταβλητή entries.
+    entries = cursor.fetchall()
+
+    # Διαγράφεται η εγγραφή με το αναγνωριστικό που δόθηκε από το χρήστη.
+    cursor.execute("""DELETE from Sequence WHERE ID = %s""" %(entry_id))
+    mydb.commit()
+
+    # Επιλέγονται ξανά όλα τα πεδία του πίνακα Sequence μετά την διαγραφή.
+    cursor.execute("""SELECT * from Sequence""")
+
+    # Εάν το πλήθος των εγγραφών πριν την διαγραφή ισούται με το πλήθος μετά,
+    # τότε δεν διαγράφθηκε κάποια από τις εγγραφές. Επομένως, δεν υπήρχε
+    # εγγραφή με το αναγνωριστικό που δόθηκε.
+    if len(entries) == len(cursor.fetchall()):
+            print('Δεν υπάρχει εγγραφή με αναγνωριστικό %s.' %(entry_id))   
+        
+# Περίπτωση που θα δώσει την τιμή 3.
+elif action_taken == 3:
+
+    # Εισαγωγή των δεδομένων εγγραφής που θέλει να εκτυπώσει ο χρήστης.
+    entry_id = int(input('Δώστε αναγνωριστικό της ζητούμενης εγγραφής: '))
+    entry_kind = input('Δώστε είδος της ζητούμενης αλληλουχίας: ')
+    entry_seq = input('Δώστε την ζητούμενη βιολογική αλληλουχία: ')
+    entry_year = int(input('Δώστε το ζητούμενο έτος καταχώρησης: '))
+
+    # Επιλογή των εγγραφών που επαληθεύουν τα δεδομένα που δόθηκαν από
+    # τον χρήστη, λαμβάνοντας υπόψη την περίπτωση που η αλληλουχία δόθηκε
+    # με μικρούς ή κεφαλαίους χαρακτήρες.
+    cursor.execute("""SELECT * from Sequence WHERE ID = %s AND
+                                                   KIND = '%s' AND
+                                                   (BIO_SEQ = '%s' OR
+                                                   BIO_SEQ = '%s') AND
+                                                   YEAR = %s"""
+                   %(entry_id, entry_kind,
+                     entry_seq.upper(), entry_seq.lower(),
+                     entry_year))
+
+    # Εκχώρηση των αποτελεσμάτων - εγγραφής που επαληθεύουν τα παραπάνω.
+    entries = cursor.fetchall()
+
+    # Εάν βρέθηκε εγγραφή, δηλαδή η λίστα entries δεν είναι άδεια, δημιουργούμε
+    # αντικείμενο με τα δεδομένα της εγγραφής αυτής, ώστε να χρησιμοποιήσουμε
+    # τη μέθοδο print_info() της κλάσης Sequence, για την εκτύπωση της εγγραφής
+    # που βρήκαμε.
+    if len(entries) > 0:
+        entry = Sequence(entries[0][0],
+                         entries[0][1],
+                         entries[0][2],
+                         entries[0][3])
+
+        entry.print_info()
+        
+# Περίπτωση που θα δώσει την τιμή 4.
+elif action_taken == 4:
+    
+    # Επιλέγονται όλα τα πεδία του πίνακα Sequence.
+    cursor.execute("""SELECT * from Sequence""")
+
+    # Εκχωρούνται όλες οι εγγραφές του πίνακα Sequence στην μεταβλητή entries.
+    entries = cursor.fetchall()
+
+    # Το κάθε στοιχείο της παραπάνω λίστας περιλαμβάνει τα τέσσερα πεδία της
+    # αντίστοιχης εγγραφής. Επομένως, για κάθε στοιχείο της λίστας, δημιουργούμε
+    # αντικείμενο της κλάσης Sequence, ώστε να χρησιμοποιήσουμε τη μέθοδο
+    # print_info().
+    for x in entries:
+        entry = Sequence(x[0],x[1],x[2],x[3])
+        entry.print_info()
+
+    # Τερματισμός του κέρσορα και της σύνδεσης με τη βάση.
+    cursor.close()
+    mydb.close()
+
+SEQUENCE ΠΟΥ ΧΡΗΣΙΜΟΠΟΙΗΘΗΚΕ ΣΤΟ ΤΡΙΤΟ ΘΕΜΑ:
+class Sequence:
+    def __init__(self,ID,KIND,BIO_SEQ,YEAR):
+        self.id = ID
+        self.kind = KIND
+        self.bio_seq = BIO_SEQ
+        self.year = YEAR
+
+    def print_info(self):
+        print('ID: %s' %(self.id))
+        print('KIND: %s' %(self.kind))
+        print('BIOLOGICAL SEQUENCE: %s' %(self.bio_seq))
+        print('YEAR: %s' %(self.year))
+
+    def validate(self):
+        DNA_dic = ['A','C','G','T']
+        RNA_dic = ['A','C','G','U']     
+        seq = self.bio_seq.upper()
+        lenght = 0
+        if self.kind == 'DNA':            
+            for x in seq:
+                if x in DNA_dic:
+                    lenght += 1
+            if lenght == len(self.bio_seq):
+                result = 'DNA sequence is valid.'
+            else:
+                result = 'DNA sequence is invalid.'
+       
+        elif self.kind == 'RNA':
+            for x in seq:
+                if x in RNA_dic:
+                    lenght += 1
+            if lenght == len(self.bio_seq):
+                result = 'RNA sequence is valid.'
+            else:
+                result = 'RNA sequence is invalid.'
+                
+        else:
+            result = 'Wrong sequence given.'
+
+        return(result)
+
